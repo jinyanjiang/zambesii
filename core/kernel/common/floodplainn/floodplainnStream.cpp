@@ -373,7 +373,6 @@ status_t FloodplainnStream::allocateScatterGatherList(
 	status_t	newId;
 	error_t 	err;
 	fplainn::dma::ScatterGatherList			*newObj=NULL;
-	fplainn::dma::scatterGatherLists::eAddressSize	_addrSize;
 
 	/**	EXPLANATION:
 	 *
@@ -381,18 +380,6 @@ status_t FloodplainnStream::allocateScatterGatherList(
 	 * Returns positive integer ID greater than 0 if successful. Else
 	 * returns an error_t error value.
 	 **/
-	_addrSize =
-#if __PADDR_NBITS__ > 32 && __PADDR_NBITS__ <= 64
-		fplainn::dma::scatterGatherLists::ADDR_SIZE_64;
-#elif __PADDR_NBITS__ <= 32
-		fplainn::dma::scatterGatherLists::ADDR_SIZE_32;
-#else
-	#error "Cannot determine what element size udi_scgth_element_t should use."
-#endif
-
-	if (_addrSize < fplainn::dma::scatterGatherLists::ADDR_SIZE_32
-		|| _addrSize > fplainn::dma::scatterGatherLists::ADDR_SIZE_64)
-		{ return ERROR_INVALID_ARG_VAL; }
 
 	scatterGatherLists.lock();
 
@@ -451,7 +438,7 @@ status_t FloodplainnStream::allocateScatterGatherList(
 	}
 
 	new (newObj) fplainn::dma::ScatterGatherList;
-	err = newObj->initialize(_addrSize);
+	err = newObj->initialize();
 	if (err != ERROR_SUCCESS)
 	{
 		printf(ERROR FPSTREAM"%x: allocScgthList: Failed to initialize "
